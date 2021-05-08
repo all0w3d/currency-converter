@@ -1,43 +1,44 @@
-import React, { useState } from "react";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const Main = () => {
-  const [cur1, setCur1] = useState("1");
-  const [cur1Value, setCur1Value] = useState("");
-  const [cur2, setCur2] = useState("1");
-  const [input, setInput] = useState();
-  const [result, setResult] = useState();
-  const [def, setDef] = useState(true);
+  const dispatch = useDispatch();
+
+  const { cur1, cur1Value, cur2, input, result, cur11, cur22 } = useSelector(
+    (state) => state.main
+  );
 
   async function getCurrnecy1(cur) {
-    setDef(false);
+    dispatch({ type: "CHANGE_CUR1", payload: cur });
     const responce = fetch(
       `https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${cur}/usd.json`
     );
-    await responce.then((res) => res.json()).then((data) => setCur1(data.usd));
+    await responce
+      .then((res) => res.json())
+      .then((data) => dispatch({ type: "GET_CURRENCY1", payload: data.usd }));
   }
 
   async function getCurrnecy2(cur) {
-    setDef(false);
+    dispatch({ type: "CHANGE_CUR2", payload: cur });
     const responce = fetch(
       `https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${cur}/usd.json`
     );
-    await responce.then((res) => res.json()).then((data) => setCur2(data.usd));
+    await responce
+      .then((res) => res.json())
+      .then((data) => dispatch({ type: "GET_CURRENCY2", payload: data.usd }));
   }
 
   function updateInput(val) {
-    setInput(val);
-    setCur1Value(val);
+    dispatch({ type: "SET_INPUT", payload: val });
+    dispatch({ type: "SET_CUR1VALUE", payload: val });
   }
 
   function getResult() {
-    setResult((input * cur1) / cur2);
+    dispatch({ type: "SET_RESULT", payload: (input * cur1) / cur2 });
   }
 
   function reset() {
-    setResult("");
-    setInput("");
-    setCur1Value("");
-    setDef(true);
+    dispatch({ type: "DEF_STATE" });
   }
 
   return (
@@ -49,10 +50,8 @@ const Main = () => {
           onChange={(e) => updateInput(e.target.value)}
         />
 
-        <select onChange={(e) => getCurrnecy1(e.target.value)}>
-          <option selected={def} value="usd">
-            usd
-          </option>
+        <select value={cur11} onChange={(e) => getCurrnecy1(e.target.value)}>
+          <option value="usd">usd</option>
           <option value="eur">eur</option>
           <option value="rub">rus rub</option>
           <option value="uah">uah</option>
@@ -62,10 +61,8 @@ const Main = () => {
 
         <div className="to">Convert to</div>
 
-        <select onChange={(e) => getCurrnecy2(e.target.value)}>
-          <option selected={def} value="usd">
-            usd
-          </option>
+        <select value={cur22} onChange={(e) => getCurrnecy2(e.target.value)}>
+          <option value="usd">usd</option>
           <option value="eur">eur</option>
           <option value="rub">rus rub</option>
           <option value="uah">uah</option>

@@ -1,41 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const Today = () => {
-  const [usd, setUsd] = useState();
-  const [eur, setEur] = useState();
-  const [rub, setRub] = useState();
-  const [date, setDate] = useState(new Date().toLocaleString());
+  const dispatch = useDispatch();
+
+  const { usd, eur, rub, date } = useSelector((state) => state.today);
 
   async function getTodayCurrency(cur1, cur2) {
-    const responce = fetch(
+    await fetch(
       `https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${cur1}/${cur2}.json`
-    );
-
-    await responce
+    )
       .then((res) => res.json())
       .then((data) => {
-        if (cur1 === "usd") {
-          setUsd(data.uah);
-        }
-        if (cur1 === "eur") {
-          setEur(data.uah);
-        }
-        if (cur1 === "rub") {
-          setRub(data.uah);
+        switch (cur1) {
+          case "usd":
+            dispatch({ type: "SET_USD", payload: data.uah });
+            break;
+
+          case "eur":
+            dispatch({ type: "SET_EUR", payload: data.uah });
+            break;
+
+          case "rub":
+            dispatch({ type: "SET_RUB", payload: data.uah });
+            break;
+
+          default:
+            break;
         }
       });
   }
 
   function dateUpdate() {
     setInterval(() => {
-      setDate(new Date().toLocaleString());
+      dispatch({ type: "SET_DATE", payload: new Date().toLocaleString() });
     }, 1000);
   }
 
-  getTodayCurrency("usd", "uah");
-  getTodayCurrency("eur", "uah");
-  getTodayCurrency("rub", "uah");
-  dateUpdate();
+  useEffect(() => {
+    return (
+      getTodayCurrency("usd", "uah"),
+      getTodayCurrency("eur", "uah"),
+      getTodayCurrency("rub", "uah"),
+      dateUpdate()
+    );
+  }, []);
 
   return (
     <div className="today">

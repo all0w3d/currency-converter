@@ -8,7 +8,7 @@ function App() {
     
     <div>
       <Header/>
-      <Today/>
+      <Today name="1" />
       <Main/>
     </div>
 
